@@ -7,6 +7,7 @@ from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.lang import Builder
 from kivy.properties import StringProperty
+from threading import Thread
 
 
 
@@ -24,22 +25,28 @@ class AquariumController(GridLayout):
     def updateTemp(self, value):
         temperature = str(value) + "F"
         self.set_temp_label = temperature
-        print("Temp: " + temperature)
+        #print("Temp: " + temperature)
 
-    def updateCurrentTemp(self, value):
+    def setCurrentTemp(self, value):
         temperature = str(value) + "F"
         self.current_temp_label = temperature
-        print("Current Temp: " + temperature)
+        #print("Current Temp: " + temperature)
         
+	def updateCurrentTemp(self, ds18b20):
+		while(true):
+			temperature = str(self.read(ds18b20)[1]) + "F"
+			self.current_temp_label = temperature
+			print("UCurrent Temp: " + temperature)
+		
     def updateFlow(self, value):
         flow = str(int(value)) + "GPH"
         self.set_flow_label = flow
-        print("Flow: " + flow)
+        #print("Flow: " + flow)
         
     def updateLight(self, value):
         lightIntensity = str(int(value)) + "%"
         self.set_light_label = lightIntensity
-        print("Light: " + lightIntensity)   
+        #print("Light: " + lightIntensity)   
 
     # -------- TEMP SENSOR
     def sensor(self):
@@ -63,14 +70,21 @@ class AquariumController(GridLayout):
     def __init__(self):
         super(AquariumController, self).__init__()
         tempSensorSerialNum = self.sensor()
-        print ("Serial Num" + tempSensorSerialNum)
+		
         self.updateTemp(self.defaultTemp)
         self.updateFlow(self.defaultFlow)
         self.updateLight(self.defaultLight)
+		
         currentTemp = self.read(tempSensorSerialNum)[1]
-        print(currentTemp)
-        self.updateCurrentTemp(str(currentTemp) + "F")    
-        
+        self.setCurrentTemp(str(currentTemp) + "F")
+		
+	tempSensorSerialNum = self.sensor()
+	t1 = Thread(target=updateCurrentTemp, args=(tempSensorSerialNum,))
+	t1.setDaemon(True)
+	t1.start()
+	while True:
+		pass
+		
         
 class AquariumControllerApp(App):
     def build(self):
