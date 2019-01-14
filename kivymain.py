@@ -15,8 +15,6 @@ class AquariumController(GridLayout):
     defaultTemp = 20.0
     defaultFlow = 100
     defaultLight = 50
-    
-    
     set_temp_label = StringProperty(str(defaultTemp) + "F")
     set_flow_label = StringProperty(str(defaultFlow) + "GPH")
     set_light_label = StringProperty(str(defaultLight) + "%")
@@ -32,12 +30,12 @@ class AquariumController(GridLayout):
         self.current_temp_label = temperature
         #print("Current Temp: " + temperature)
         
-	def updateCurrentTemp(self, ds18b20):
-		while(true):
-			temperature = str(self.read(ds18b20)[1]) + "F"
-			self.current_temp_label = temperature
-			print("UCurrent Temp: " + temperature)
-		
+    def updateCurrentTemp(self):
+        print(self.sensor()[1])
+        temperature = str(self.read(self.tempSensorSerialNum)[1]) + "F"
+        self.current_temp_label = temperature
+        print("UCurrent Temp: " + temperature)
+        
     def updateFlow(self, value):
         flow = str(int(value)) + "GPH"
         self.set_flow_label = flow
@@ -66,25 +64,19 @@ class AquariumController(GridLayout):
         celsius = temperature / 1000
         farenheit = (celsius * 1.8) + 32
         return celsius, farenheit
-        
+
+
     def __init__(self):
         super(AquariumController, self).__init__()
-        tempSensorSerialNum = self.sensor()
-		
+        self.tempSensorSerialNum = self.sensor()
+        
         self.updateTemp(self.defaultTemp)
         self.updateFlow(self.defaultFlow)
         self.updateLight(self.defaultLight)
-		
-        currentTemp = self.read(tempSensorSerialNum)[1]
+        
+        currentTemp = self.read(self.tempSensorSerialNum)[1]
         self.setCurrentTemp(str(currentTemp) + "F")
-		
-	tempSensorSerialNum = self.sensor()
-	t1 = Thread(target=updateCurrentTemp, args=(tempSensorSerialNum,))
-	t1.setDaemon(True)
-	t1.start()
-	while True:
-		pass
-		
+        
         
 class AquariumControllerApp(App):
     def build(self):
