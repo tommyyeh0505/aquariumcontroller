@@ -1,11 +1,15 @@
 import kivy
 import os
+<<<<<<< HEAD
 from kivy.app import App
+=======
+>>>>>>> 610e980f517f05b8c41ad0c709b0d12a525f9ea5
 from kivy.uix.gridlayout import GridLayout
 from kivy.lang import Builder
 from kivy.properties import StringProperty
 
 class AquariumController(GridLayout):
+<<<<<<< HEAD
     defaultTemp = 20.0
     defaultFlow = 100
     defaultLight = 50
@@ -85,5 +89,3 @@ class AquariumController(GridLayout):
         
         currentTemp = self.read(self.tempSensorSerialNum)[1]
         self.setCurrentTemp(str(currentTemp) + "F")
-        
-        
